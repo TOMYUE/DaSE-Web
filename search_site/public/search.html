@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="scss/style.scss">
+    <title>news station</title>
+</head>
+<style>
+    body {
+        background-image: url("./images/Ocean.jpg");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: top center;
+        background-size: 100% 27%;
+    }
+    .form-submit-button {
+        background: #B9DFFF;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 20px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow: none;
+    }
+    .form-submit-button:hover {
+        background: #016ABC;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 20px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow: none;
+    }
+</style>
+<body>
+<link href="stylesheets/style.scss" rel="stylesheet" type="text/css">
+
+
+<div class="content">
+<!--   <div class="container">-->
+       <center>
+           <div style="font-size: 50px; color: white; top: 20px; padding: 20px"> News Crawl Station </div></center>
+
+       <div style="display: flex;width: auto; flex-display:row; position: relative;left: 37%">
+           <div>
+               <div style="font-size: 30px"><a href="search.html">News Search</a></div>
+           </div>
+           <div style="color: #727577; padding: 10px">  |  </div>
+           <div>
+               <div style="font-size: 30px"><a href="analyse.html">Hot Analysis</a></div>
+           </div>
+       </div>
+
+<!--       -->
+       <form accept-charset="UTF-8">
+
+       <br>
+           <div style="display: flex;width: 100%; flex-display:row;justify-content: space-between;position: relative; margin-left: 20px">
+               <div style="width: 30%; position: relative; padding: 20px" >
+                    <div><h5>Title:</h5></div>
+                    <input type="text" name="title_text" placeholder="please enter title"
+                           style="outline-style: none ;
+                                  border: 1px solid #ccc;
+                                  border-radius: 3px;
+                                  padding: 13px 14px;
+                                  width: 315px;
+                                  font-size: 14px;
+                                  font-weight: 700;">
+               </div>
+
+               <div style="width:30%; position: relative; padding: 20px;">
+                   <div><h5>Keywords:</h5></div>
+                    <input type="text" name="keywords_text" placeholder="please enter keywords;"
+                           style="outline-style: none ;
+                                  border: 1px solid #ccc;
+                                  border-radius: 3px;
+                                  padding: 13px 14px 10px 10px;
+                                  width: 315px;
+                                  font-size: 14px;
+                                  font-weight: 700;">
+               </div>
+               <div style="width:30%; position: relative; padding: 20px" >
+                   <div><h5>From:</h5></div>
+                    <input type="text" name="source_name_text" placeholder="please enter source"
+                           style="outline-style: none ;
+                                  border: 1px solid #ccc;
+                                  border-radius: 3px;
+                                  padding: 13px 14px;
+                                  width: 315px;
+                                  font-size: 14px;
+                                  font-weight: 700;">
+               </div>
+           </div>
+       <br>
+           <div style="display: flex;width: 100%; flex-display:row; position: center; margin-left: 40px">
+                <input class="form-submit-button" type="button" value="Search" onclick="search();" style="outline-style: none ;
+                            border: 1px solid #ccc;
+                            border-radius: 3px;
+                            padding: 6px;
+                            width: 315px;
+                            font-size: 14px;
+                            left: 37%">
+           </div>
+
+       </form>
+<!--       -->
+       <div class="container">
+       <h4 id="record"></h4>
+       <div class="table-responsive">
+           <table id="record2" class="table custom-table">
+<!-- append to fill the table -->
+           </table>
+       </div>
+   </div>
+</div>
+
+
+<script>
+    function search() {
+        $.get('/process_get?title=' + $("input[name='title_text']").val() + '&keywords=' + $("input[name='keywords_text']").val() + '&source_name=' + $("input[name='source_name_text']").val(), function (data) {
+            $("#record2").empty();
+            $("#record2").append('总计 ' + data.length + ' 条记录');
+            $("#record2").append(
+                '<thead><tr>' +
+                '<th scope="col"><b>Title</b></th>' +
+                '<th scope="col"><b>Keywords</b></th>' +
+                '<th scope="col"><b>Source</b></th>' +
+                '<th scope="col"><b>Date</b></th>' +
+                '</tr>' +
+                '</thead><tbody>'
+            );
+            for (let i = 0; i < data.length; i++) {
+                console.log(data[i]);
+                if(i % 2 === 0) {
+                    let table = '<tr><td>';
+                    table += ('<a href=' + data[i].url + '>' + data[i].title + '</a></td><td>');
+                    table += (data[i].keywords + '</td><td>');
+                    table += (data[i].source_name + '</td><td>');
+                    table += (data[i].publish_date.substring(0, 10) + '</td></tr>');  // 日期只取精确到日
+                    $("#record2").append(table);
+                }
+                else{
+                    let table = '<tr class="active-row"><td>';
+                    table += ('<a href=' + data[i].url + '>' + data[i].title + '</a></td><td>');
+                    table += (data[i].keywords + '</td><td>');
+                    table += (data[i].source_name + '</td><td>');
+                    table += (data[i].publish_date.substring(0, 10) + '</td></tr>');  // 日期只取精确到日
+                    $("#record2").append(table);
+                }
+            }
+            $("#record2").append('</tbody>');
+        });
+    }
+</script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

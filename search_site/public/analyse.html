@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@4.7.0/dist/echarts.min.js"></script>
+</head>
+
+<style>
+    .form-submit-button {
+        background: #B9DFFF;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 20px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow: none;
+    }
+    .form-submit-button:hover {
+        background: #016ABC;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 20px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow: none;
+    }
+</style>
+
+<body>
+<div class="content">
+    <div class="container">
+        <center>
+            <h1> Hot news </h1></center>
+        <div style="display: flex;width: 100%; flex-display:row; position: relative; margin-left: 33%">
+            <div>
+                <div style="font-size: 30px"><a href="search.html">News Search</a></div>
+            </div>
+            <div style="color: #727577; padding: 10px">  |  </div>
+            <div>
+                <div style="font-size: 30px"><a href="analyse.html">Hot Analysis</a></div>
+            </div>
+        </div>
+
+        <form>
+            <div>
+                <div style="width: 30%; position: relative; margin-left: 40px; margin-top: 5px">
+                    <input  type="text" name="keywords_text" placeholder="搜索关键词">
+                </div>
+                <br>
+                <div style="display: flex; flex-direction: row;position:relative; margin-left: 40px;justify-content: space-between">
+                    <div style="width: 30%; position: absolute; margin-bottom: 20px">
+                        <input  type="button" value="查询" onclick="searchKey()" class="form-submit-button"/>
+                    </div>
+                    <div style="width: 30%; position: absolute; margin-left: 40px; margin-bottom: 20px;padding-left: 20px">
+                        <input  type="button" value="绘图" onclick="drawMap()" class="form-submit-button"/>
+                    </div>
+<!--                    <div id="graph"></div>-->
+                </div>
+            </div>
+        </form>
+        <br>
+        <br>
+        <div class="table-responsive">
+            <table class="table custom-table" id="record">
+
+            </table>
+        </div>
+        <div id="main" style="width: 1200px;height:600px; margin-left: 0%"></div>
+    </div>
+</div>
+
+<script>
+    function searchKey() {
+        $.get('/keywords_get?keywords=' + $("input:text").val(), function (data) {
+            $("#record").empty();
+            $("#record").append('<p>共 ' + data.length + ' 条新闻纪录</p>');
+            $("#record").append('<tr><th>Date</th><th>Hot Index</th></tr>');
+            var Date = new Array();
+            for (let i = 0; i < data.length; i++) {
+                var publish_date = data[i].publish_date.substring(0, 10);
+                if (publish_date in Date) {
+                    Date[publish_date] += 1;
+                }
+                else {
+                    Date[publish_date] = 1;
+                }
+            }
+            var dateSort = Object.keys(Date).sort();
+
+            let table = '';
+            for (var key in dateSort) {
+                table += '<tr><td>';
+                table += (dateSort[key] + '</td><td>' + Date[dateSort[key]] + '</td></tr>')
+            }
+            $("#record").append(table);
+        });
+    }
+</script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/main.js"></script>
+<script type="text/javascript">
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    $.get('/keywords_get?keywords=' + $("input:text").val(), function (data) {
+        let datelist = [];
+        let DateForNum = new Array();
+        for (let i = 0; i < data.length; i++) {
+            let publish_date = data[i].publish_date.substring(0, 10);
+            if (publish_date in DateForNum) {
+                DateForNum[publish_date] += 1;
+            }
+            else {
+                DateForNum[publish_date] = 1;
+                datelist.push(publish_date);
+            }
+        }
+        var dateSort = Object.keys(DateForNum).sort();
+        datelist = datelist.sort();
+        console.log(datelist);
+        dataX = []
+        for(let i = 0; i < datelist.length; ++i) {
+            dataX[i] = DateForNum[datelist[i]];
+        }
+        myChart.setOption({
+            title: {
+                text: '热度分析'
+            },
+            legend: {
+                data: ['数量']
+            },
+            xAxis: {
+                data: datelist
+            },
+            yAxis: {
+            },
+            series: [{
+                name: '相关报道数',
+                type: 'bar',
+                data: dataX
+            }]
+        })
+    });
+
+</script>
+</body>
+</html>
